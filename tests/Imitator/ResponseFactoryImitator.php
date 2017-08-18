@@ -22,7 +22,9 @@ class ResponseFactoryImitator implements ResponseFactoryInterface
         if (array_key_exists('errors', $data)) {
             $errors = [];
             foreach ($data['errors'] as $error) {
-                $errors[] = (object) ['propertyPath' => $error->getPropertyPath(), 'message' => $error->getMessage()];
+                $errors[] = is_object($error)
+                    ? (object) ['propertyPath' => $error->getPropertyPath(), 'message' => $error->getMessage()]
+                    : $error;
             }
             $data['errors'] = $errors;
         }

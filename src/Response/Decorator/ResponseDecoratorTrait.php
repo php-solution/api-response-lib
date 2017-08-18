@@ -4,6 +4,7 @@ namespace PhpSolution\ApiResponseLib\Response\Decorator;
 use PhpSolution\ApiResponseLib\Configuration\Configuration;
 use PhpSolution\ApiResponseLib\Configuration\ListConfiguration;
 use PhpSolution\ApiResponseLib\Response\Factory\ResponseFactoryInterface;
+use PhpSolution\StdLib\Exception\NotFoundException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
@@ -21,6 +22,8 @@ trait ResponseDecoratorTrait
     public function response($data, Configuration $configuration = null): Response
     {
         switch (true) {
+            case $data instanceof NotFoundException:
+                return $this->errorResponse([$data->getMessage()], (new Configuration())->setStatus(Response::HTTP_NOT_FOUND));
             case $data instanceof ConstraintViolationListInterface:
                 return $this->validationErrorResponse($data, $configuration);
             case is_array($data) && ($configuration instanceof ListConfiguration):

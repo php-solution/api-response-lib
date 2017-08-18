@@ -4,6 +4,7 @@ namespace Tests;
 use PhpSolution\ApiResponseLib\Configuration\ListConfiguration;
 use PhpSolution\ApiResponseLib\TestCase\ResponseAssertTrait;
 use PhpSolution\ApiResponseLib\Response\Decorator\ResponseDecoratorTrait;
+use PhpSolution\StdLib\Exception\NotFoundException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -16,25 +17,34 @@ class ResponseDecoratorTest extends TestCase
 {
     use ResponseAssertTrait;
 
+    public function testNotFoundExceptionResponse()
+    {
+        $text = 'Something was not found';
+        $errors = new NotFoundException($text);
+        $response = (new ResponseDecoratorImitator())->response($errors);
+        $response = $this->assertErrorJsonResponse($response);
+    }
+
     /**
      * @see ResponseDecoratorTrait::response()
-     * @see ResponseDecoratorTrait::okResponse()
+     * @see ResponseDecoratorTrait::validationErrorResponse()
      */
-    public function testOkResponse()
+    public function testValidationErrorResponse(): void
     {
-        $data = [1, '2' => 3, 'a' => 'b'];
+        $errors = new ConstraintViolationList();
+        $errors->add(new ConstraintViolation('Message', 'Template', [], null, 'email', null));
 
-        $response = (new ResponseDecoratorImitator())->response($data);
-        $response = $this->assertCorrectJsonResponse($response);
-        $this->assertArraySubset($data, $response);
-        $this->assertArraySubset($response, $data);
+        $response = (new ResponseDecoratorImitator())->response($errors);
+        $response = $this->assertErrorJsonResponse($response);
+        $this->assertEquals('email', $response[0]['propertyPath']);
+        $this->assertEquals('Message', $response[0]['message']);
     }
 
     /**
      * @see ResponseDecoratorTrait::response()
      * @see ResponseDecoratorTrait::listResponse()
      */
-    public function testListResponse()
+    public function testListResponse(): void
     {
         $data = [1, '2' => 3, 'a' => 'b'];
 
@@ -46,16 +56,15 @@ class ResponseDecoratorTest extends TestCase
 
     /**
      * @see ResponseDecoratorTrait::response()
-     * @see ResponseDecoratorTrait::validationErrorResponse()
+     * @see ResponseDecoratorTrait::okResponse()
      */
-    public function testValidationErrorResponse()
+    public function testOkResponse(): void
     {
-        $errors = new ConstraintViolationList();
-        $errors->add(new ConstraintViolation('Message', 'Template', [], null, 'email', null));
+        $data = [1, '2' => 3, 'a' => 'b'];
 
-        $response = (new ResponseDecoratorImitator())->response($errors);
-        $response = $this->assertErrorJsonResponse($response);
-        $this->assertEquals('email', $response[0]['propertyPath']);
-        $this->assertEquals('Message', $response[0]['message']);
+        $response = (new ResponseDecoratorImitator())->response($data);
+        $response = $this->assertCorrectJsonResponse($response);
+        $this->assertArraySubset($data, $response);
+        $this->assertArraySubset($response, $data);
     }
 }
