@@ -4,7 +4,8 @@ namespace PhpSolution\ApiResponseLib\Response\Decorator;
 use PhpSolution\ApiResponseLib\Configuration\Configuration;
 use PhpSolution\ApiResponseLib\Configuration\ListConfiguration;
 use PhpSolution\ApiResponseLib\Response\Factory\ResponseFactoryInterface;
-use PhpSolution\StdLib\Exception\NotFoundException;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
@@ -22,8 +23,8 @@ trait ResponseDecoratorTrait
     public function response($data, Configuration $configuration = null): Response
     {
         switch (true) {
-            case $data instanceof NotFoundException:
-                return $this->errorResponse([$data->getMessage()], (new Configuration())->setStatus(Response::HTTP_NOT_FOUND));
+            case $data instanceof Form:
+                return $this->formErrorResponse($data, $configuration);
             case $data instanceof ConstraintViolationListInterface:
                 return $this->validationErrorResponse($data, $configuration);
             case is_array($data) && ($configuration instanceof ListConfiguration):
@@ -87,19 +88,34 @@ trait ResponseDecoratorTrait
     }
 
     /**
-     * @param ConstraintViolationListInterface $violations
-     * @param Configuration|null               $configuration
+     * @param FormInterface      $form
+     * @param Configuration|null $configuration
      *
      * @return Response
      */
-    public function validationErrorResponse(ConstraintViolationListInterface $violations, Configuration $configuration = null): Response
+    public function formErrorResponse(FormInterface $form, Configuration $configuration = null): Response
+    {
+        if ($form->isSubmitted()) {
+            return $this->validationErrorResponse($form->getErrors(true), $configuration);
+        }
+
+        return $this->validationErrorResponse(['Expected values were not submitted'], $configuration);
+    }
+
+    /**
+     * @param mixed              $errors
+     * @param Configuration|null $configuration
+     *
+     * @return Response
+     */
+    public function validationErrorResponse($errors, Configuration $configuration = null): Response
     {
         $configuration = (null === $configuration) ? new Configuration() : $configuration;
         if (null === $configuration->getStatus()) {
             $configuration->setStatus(Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->errorResponse($violations, $configuration);
+        return $this->errorResponse($errors, $configuration);
     }
 
     /**

@@ -50,4 +50,17 @@ trait ResponseAssertTrait
 
         return $responseData['errors'];
     }
+
+    /**
+     * @param Response $response
+     *
+     * @return mixed
+     */
+    protected function assertValidationErrorJsonResponse(Response $response)
+    {
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $responseData = json_decode($response->getContent(), true);
+
+        return $responseData['errors'];
+    }
 }
