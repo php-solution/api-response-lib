@@ -10,19 +10,25 @@ trait ResponseAssertTrait
 {
     /**
      * @param Response $response
+     * @param int|null $status
      */
-    protected function assertCorrectResponse(Response $response)
+    protected function assertCorrectResponse(Response $response, int $status = null)
     {
-        $this->assertGreaterThanOrEqual(Response::HTTP_OK, $response->getStatusCode());
-        $this->assertLessThan(Response::HTTP_MULTIPLE_CHOICES, $response->getStatusCode());
+        if (null === $status) {
+            $this->assertGreaterThanOrEqual(Response::HTTP_OK, $response->getStatusCode());
+            $this->assertLessThan(Response::HTTP_MULTIPLE_CHOICES, $response->getStatusCode());
+        } else {
+            $this->assertEquals($status, $response->getStatusCode());
+        }
     }
 
     /**
      * @param Response $response
+     * @param int|null $status
      *
-     * @return array
+     * @return mixed
      */
-    protected function assertCorrectJsonResponse(Response $response)
+    protected function assertCorrectJsonResponse(Response $response, int $status = null)
     {
         $this->assertCorrectResponse($response);
         $responseData = json_decode($response->getContent(), true);
@@ -32,20 +38,24 @@ trait ResponseAssertTrait
 
     /**
      * @param Response $response
+     * @param int|null $status
      */
-    protected function assertErrorResponse(Response $response)
+    protected function assertErrorResponse(Response $response, int $status)
     {
-        $this->assertGreaterThanOrEqual(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        null === $status
+            ? $this->assertGreaterThanOrEqual(Response::HTTP_BAD_REQUEST, $response->getStatusCode())
+            : $this->assertEquals($status, $response->getStatusCode());
     }
 
     /**
      * @param Response $response
+     * @param int|null $status
      *
      * @return mixed
      */
-    protected function assertErrorJsonResponse(Response $response)
+    protected function assertErrorJsonResponse(Response $response, int $status = null)
     {
-        $this->assertErrorResponse($response);
+        $this->assertErrorResponse($response, $status);
         $responseData = json_decode($response->getContent(), true);
 
         return $responseData['errors'];
@@ -58,9 +68,6 @@ trait ResponseAssertTrait
      */
     protected function assertValidationErrorJsonResponse(Response $response)
     {
-        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-        $responseData = json_decode($response->getContent(), true);
-
-        return $responseData['errors'];
+        return $this->assertErrorJsonResponse($response, Response::HTTP_BAD_REQUEST);
     }
 }
