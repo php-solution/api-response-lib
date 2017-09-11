@@ -40,7 +40,7 @@ trait ResponseAssertTrait
      * @param Response $response
      * @param int|null $status
      */
-    protected function assertErrorResponse(Response $response, int $status)
+    protected function assertErrorResponse(Response $response, int $status = null)
     {
         null === $status
             ? $this->assertGreaterThanOrEqual(Response::HTTP_BAD_REQUEST, $response->getStatusCode())
