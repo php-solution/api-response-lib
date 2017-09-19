@@ -58,7 +58,7 @@ trait ResponseAssertTrait
         $this->assertErrorResponse($response, $status);
         $responseData = json_decode($response->getContent(), true);
 
-        return $responseData['errors'];
+        return $responseData['error'];
     }
 
     /**

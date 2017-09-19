@@ -82,7 +82,7 @@ trait ResponseDecoratorTrait
             $configuration->setStatus(Response::HTTP_INTERNAL_SERVER_ERROR);
         }
         $fullData = $configuration->getData();
-        $fullData['errors'] = $errors;
+        $fullData['error'] = $errors;
 
         return $this->getResponseFactory()->createResponse($fullData, $configuration);
     }
