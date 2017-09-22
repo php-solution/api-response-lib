@@ -30,7 +30,7 @@ trait ResponseAssertTrait
      */
     protected function assertCorrectJsonResponse(Response $response, int $status = null)
     {
-        $this->assertCorrectResponse($response);
+        $this->assertCorrectResponse($response, $status);
         $responseData = json_decode($response->getContent(), true);
 
         return $responseData['data'];
