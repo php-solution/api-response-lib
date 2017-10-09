@@ -1,13 +1,11 @@
 <?php
+
 namespace Tests;
 
 use PhpSolution\ApiResponseLib\Configuration\ListConfiguration;
 use PhpSolution\ApiResponseLib\TestCase\ResponseAssertTrait;
 use PhpSolution\ApiResponseLib\Response\Decorator\ResponseDecoratorTrait;
-use PhpSolution\StdLib\Exception\NotFoundException;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Validator\ConstraintViolation;
-use Symfony\Component\Validator\ConstraintViolationList;
 use Tests\Imitator\ResponseDecoratorImitator;
 
 /**
@@ -17,29 +15,6 @@ class ResponseDecoratorTest extends TestCase
 {
     use ResponseAssertTrait;
 
-    public function testNotFoundExceptionResponse()
-    {
-        $text = 'Something was not found';
-        $errors = new NotFoundException($text);
-        $response = (new ResponseDecoratorImitator())->response($errors);
-        $response = $this->assertErrorJsonResponse($response);
-    }
-
-    /**
-     * @see ResponseDecoratorTrait::response()
-     * @see ResponseDecoratorTrait::validationErrorResponse()
-     */
-    public function testValidationErrorResponse(): void
-    {
-        $errors = new ConstraintViolationList();
-        $errors->add(new ConstraintViolation('Message', 'Template', [], null, 'email', null));
-
-        $response = (new ResponseDecoratorImitator())->response($errors);
-        $response = $this->assertErrorJsonResponse($response);
-        $this->assertEquals('email', $response[0]['propertyPath']);
-        $this->assertEquals('Message', $response[0]['message']);
-    }
-
     /**
      * @see ResponseDecoratorTrait::response()
      * @see ResponseDecoratorTrait::listResponse()
@@ -48,10 +23,10 @@ class ResponseDecoratorTest extends TestCase
     {
         $data = [1, '2' => 3, 'a' => 'b'];
 
-        $response = (new ResponseDecoratorImitator())->response($data, new ListConfiguration(17));
-        $response = $this->assertCorrectJsonResponse($response);
+        $response = (new ResponseDecoratorImitator())->response($data, new ListConfiguration(0, 17));
+        $response = $this->assertOkJsonResponse($response);
         $this->assertEquals(17, $response['count']);
-        $this->assertArraySubset($data, $response['list']);
+        $this->assertArraySubset($data, $response['data']);
     }
 
     /**

@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests\Imitator;
 
 use PhpSolution\ApiResponseLib\Configuration\Configuration;

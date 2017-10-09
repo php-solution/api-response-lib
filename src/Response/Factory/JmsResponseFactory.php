@@ -1,4 +1,5 @@
 <?php
+
 namespace PhpSolution\ApiResponseLib\Response\Factory;
 
 use JMS\Serializer\SerializationContext;

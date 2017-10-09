@@ -1,8 +1,9 @@
 <?php
+
 namespace PhpSolution\ApiResponseLib\Response\Decorator;
 
 use PhpSolution\ApiResponseLib\Configuration\Configuration;
-use PhpSolution\ApiResponseLib\Configuration\ListConfiguration;
+use PhpSolution\ApiResponseLib\Response\Adapter\ListAdapter;
 use PhpSolution\ApiResponseLib\Response\Factory\ResponseFactoryInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
@@ -27,8 +28,8 @@ trait ResponseDecoratorTrait
                 return $this->formErrorResponse($data, $configuration);
             case $data instanceof ConstraintViolationListInterface:
                 return $this->validationErrorResponse($data, $configuration);
-            case is_array($data) && ($configuration instanceof ListConfiguration):
-                return $this->listResponse($data, $configuration);
+            case $data instanceof ListAdapter:
+                return $this->okResponse($data->getList(), $data->getConfiguration());
             default:
                 return $this->okResponse($data, $configuration);
         }
@@ -50,23 +51,6 @@ trait ResponseDecoratorTrait
         $fullData['data'] = $data;
 
         return $this->getResponseFactory()->createResponse($fullData, $configuration);
-    }
-
-    /**
-     * @param array                  $list
-     * @param ListConfiguration|null $configuration
-     *
-     * @return Response
-     */
-    public function listResponse(array $list, ListConfiguration $configuration = null): Response
-    {
-        $configuration = (null === $configuration) ? new ListConfiguration() : $configuration;
-        $data = [
-            'count' => null === $configuration->getTotalCount() ? count($list) : $configuration->getTotalCount(),
-            'list' => $list,
-        ];
-
-        return $this->okResponse($data, $configuration);
     }
 
     /**

@@ -1,4 +1,5 @@
 <?php
+
 namespace PhpSolution\ApiResponseLib\Configuration;
 
 /**
@@ -9,21 +10,47 @@ class ListConfiguration extends Configuration
     /**
      * @var int
      */
+    private $page;
+    /**
+     * @var int
+     */
     private $totalCount;
 
     /**
+     * @param int      $page
      * @param int|null $totalCount
      */
-    public function __construct(int $totalCount = null)
+    public function __construct(int $page, int $totalCount)
     {
         parent::__construct();
+        $this->page = $page;
         $this->totalCount = $totalCount;
     }
 
     /**
-     * @return int|null
+     * @return int
      */
-    public function getTotalCount():? int
+    public function getPage(): int
+    {
+        return $this->page;
+    }
+
+    /**
+     * @param int $page
+     *
+     * @return self
+     */
+    public function setPage(int $page)
+    {
+        $this->page = $page;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTotalCount(): int
     {
         return $this->totalCount;
     }
@@ -38,5 +65,17 @@ class ListConfiguration extends Configuration
         $this->totalCount = $totalCount;
 
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getData(): array
+    {
+        $data =  parent::getData();
+        $data['page'] = $this->getPage();
+        $data['count'] = $this->getTotalCount();
+
+        return $data;
     }
 }

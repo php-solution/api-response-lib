@@ -1,4 +1,5 @@
 <?php
+
 namespace PhpSolution\ApiResponseLib\TestCase;
 
 use Symfony\Component\HttpFoundation\Response;
@@ -28,12 +29,23 @@ trait ResponseAssertTrait
      *
      * @return mixed
      */
-    protected function assertCorrectJsonResponse(Response $response, int $status = null)
+    protected function assertOkJsonResponse(Response $response, int $status = null)
     {
         $this->assertCorrectResponse($response, $status);
         $responseData = json_decode($response->getContent(), true);
 
-        return $responseData['data'];
+        return $responseData;
+    }
+
+    /**
+     * @param Response $response
+     * @param int|null $status
+     *
+     * @return mixed
+     */
+    protected function assertCorrectJsonResponse(Response $response, int $status = null)
+    {
+        return $this->assertOkJsonResponse($response, $status)['data'];
     }
 
     /**

@@ -1,4 +1,5 @@
 <?php
+
 namespace PhpSolution\ApiResponseLib\Configuration\Format;
 
 /**
