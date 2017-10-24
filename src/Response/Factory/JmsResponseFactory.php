@@ -32,6 +32,9 @@ class JmsResponseFactory implements ResponseFactoryInterface
     {
         $serializeContext = SerializationContext::create()
             ->setSerializeNull($configuration->isSerializeNull());
+        if (!empty($groups = $configuration->getGroups())) {
+            $serializeContext->setGroups($groups);
+        }
 
         $content = $this->serializer->serialize($data, $configuration->getFormat()->getType(), $serializeContext);
 

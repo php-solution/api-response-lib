@@ -30,6 +30,10 @@ class Configuration
      * @var bool
      */
     private $archive = false;
+    /**
+     * @var array
+     */
+    private $groups = [];
 
     /**
      * @param FormatInterface|null $format
@@ -135,6 +139,26 @@ class Configuration
     public function setArchive($archive)
     {
         $this->archive = (bool) $archive;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getGroups(): array
+    {
+        return $this->groups;
+    }
+
+    /**
+     * @param array $groups
+     *
+     * @return self
+     */
+    public function setGroups(array $groups)
+    {
+        $this->groups = $groups;
 
         return $this;
     }
