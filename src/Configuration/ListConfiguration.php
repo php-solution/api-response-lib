@@ -74,7 +74,7 @@ class ListConfiguration extends Configuration
     {
         $data =  parent::getData();
         $data['page'] = $this->getPage();
-        $data['count'] = $this->getTotalCount();
+        $data['total'] = $this->getTotalCount();
 
         return $data;
     }
