@@ -33,7 +33,7 @@ class Configuration
     /**
      * @var array
      */
-    private $groups = [];
+    private $groups = ['Default'];
 
     /**
      * @param FormatInterface|null $format
@@ -161,5 +161,43 @@ class Configuration
         $this->groups = $groups;
 
         return $this;
+    }
+
+    /**
+     * @param string $group
+     *
+     * @return self
+     */
+    public function addGroup(string $group)
+    {
+        if (!$this->hasGroup($group)) {
+            $this->groups[] = $group;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $group
+     *
+     * @return self
+     */
+    public function removeGroup(string $group)
+    {
+        if (!$this->hasGroup($group)) {
+            unset($this->groups[array_search($group, $this->groups)]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $group
+     *
+     * @return bool
+     */
+    public function hasGroup(string $group): bool
+    {
+        return in_array($group, $this->groups);
     }
 }
